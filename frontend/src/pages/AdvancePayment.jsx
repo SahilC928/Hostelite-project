@@ -460,7 +460,7 @@ export default function AdvancePayment() {
                                 className="contact-support-btn"
                                 onClick={() => {
                                     // Could open a support modal or navigate to help page
-                                    alert("For support, please contact: support@hostelite.com or call +91-6261582940, +91-9284554095");
+                                    alert("For support, please contact: support@hostelite.com or call +916261582940, +919284554095");
                                 }}
                             >
                                 Contact Support
