@@ -1,0 +1,12 @@
+.app-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
+}
+
+.main-content {
+  flex: 1;
+  padding: 20px;
+  min-height: calc(100vh - 60px - 200px); /* navbar height + footer height */
+}

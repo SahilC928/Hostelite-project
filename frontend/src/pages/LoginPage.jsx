@@ -211,7 +211,7 @@ export default function LoginPage() {
 
       {/* FACILITIES CAROUSEL */}
 
-      <section id="facilities" className="facilities">
+      <section className="facilities">
         <div className="container">
           <div className="section-header">
             <h2 className="section-title">
@@ -467,7 +467,7 @@ export default function LoginPage() {
             </div>
 
             <div className="feature-item">
-              <div className="feature-icon-large">�</div>
+              <div className="feature-icon-large">🔒</div>
               <h3>100% Secure</h3>
               <p>Your data is protected with enterprise-grade encryption</p>
             </div>
@@ -536,7 +536,7 @@ export default function LoginPage() {
                 Highly recommend!"
               </div>
               <div className="testimonial-author">
-                <div className="author-avatar">�‍🎓</div>
+                <div className="author-avatar">👨‍🎓</div>
                 <div>
                   <div className="author-name">Amit Patel</div>
                   <div className="author-role">Electrical Engineering</div>
@@ -549,7 +549,7 @@ export default function LoginPage() {
 
       {/* FOOTER */}
 
-      <footer id="footer" className="footer">
+      <footer className="footer">
         <div className="container">
           <div className="footer-content">
             <div className="footer-brand">
