@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import API from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
 import "../styles/payment.css";
+import QRCode from "qrcode";
 import { 
     CreditCard, 
     User, 
@@ -16,7 +17,9 @@ import {
     Download,
     Filter,
     IndianRupee,
-    Zap
+    Zap,
+    Smartphone,
+    QrCode
 } from "lucide-react";
 
 export default function StudentPayment() {
@@ -30,11 +33,47 @@ export default function StudentPayment() {
     const [historyLoading, setHistoryLoading] = useState(true);
     const [filterStatus, setFilterStatus] = useState("all");
     const [razorpayLoaded, setRazorpayLoaded] = useState(false);
+    const [showQrPayment, setShowQrPayment] = useState(false);
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('razorpay');
+    const [qrCodeUrl, setQrCodeUrl] = useState('');
+    const [qrLoading, setQrLoading] = useState(false);
 
     useEffect(() => {
         fetchPaymentHistory();
         loadRazorpayScript();
     }, []);
+
+    const generatePhonePeQR = async () => {
+        if (!amount || parseFloat(amount) <= 0) return;
+        
+        setQrLoading(true);
+        try {
+            // Create PhonePe UPI payment string with amount
+            const upiString = `upi://pay?pa=hostelite@phonepe&pn=Hostelite&am=${parseFloat(amount)}&cu=INR&tn=Hostel Fee Payment`;
+            
+            // Generate QR Code
+            const qrDataUrl = await QRCode.toDataURL(upiString, {
+                width: 200,
+                margin: 2,
+                color: {
+                    dark: '#000000',
+                    light: '#FFFFFF'
+                }
+            });
+            
+            setQrCodeUrl(qrDataUrl);
+        } catch (error) {
+            console.error('Error generating QR code:', error);
+        } finally {
+            setQrLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (showQrPayment && amount) {
+            generatePhonePeQR();
+        }
+    }, [showQrPayment, amount]);
 
     const loadRazorpayScript = () => {
         if (window.Razorpay) {
@@ -293,10 +332,11 @@ For any queries, please contact the hostel office.
 
                         <button 
                             type="submit" 
-                            className={`submit-btn ${!isFormValid ? 'disabled' : ''}`}
+                            className={`submit-btn ${!isFormValid ? 'disabled' : ''} ${selectedPaymentMethod === 'razorpay' ? 'primary' : 'secondary'}`}
                             disabled={!isFormValid || loading || !razorpayLoaded}
+                            onClick={() => setSelectedPaymentMethod('razorpay')}
                         >
-                            {loading ? (
+                            {selectedPaymentMethod === 'razorpay' && loading ? (
                                 <>
                                     <Loader2 size={20} className="spinner" />
                                     Processing...
@@ -316,6 +356,20 @@ For any queries, please contact the hostel office.
 
                         <button 
                             type="button"
+                            className={`submit-btn ${!isFormValid ? 'disabled' : ''} ${selectedPaymentMethod === 'phonepe' ? 'primary' : 'secondary'}`}
+                            disabled={!isFormValid}
+                            onClick={() => {
+                                setSelectedPaymentMethod('phonepe');
+                                generatePhonePeQR();
+                                setShowQrPayment(true);
+                            }}
+                        >
+                            <QrCode size={20} />
+                            Pay with PhonePe
+                        </button>
+
+                        <button 
+                            type="button"
                             className="secondary-btn"
                             onClick={() => {
                                 console.log("Advanced Payment Options clicked");
@@ -328,6 +382,98 @@ For any queries, please contact the hostel office.
                             Advanced Payment Options
                         </button>
                     </form>
+
+                    {/* QR Code Payment Modal */}
+                    {showQrPayment && (
+                        <div className="qr-modal-overlay" onClick={() => setShowQrPayment(false)}>
+                            <div className="qr-modal" onClick={(e) => e.stopPropagation()}>
+                                <div className="qr-modal-header">
+                                    <div className="qr-modal-title">
+                                        <Smartphone size={24} />
+                                        <h3>PhonePe Payment</h3>
+                                    </div>
+                                    <button 
+                                        className="close-btn" 
+                                        onClick={() => setShowQrPayment(false)}
+                                    >
+                                        <X size={20} />
+                                    </button>
+                                </div>
+                                
+                                <div className="qr-content">
+                                    <div className="qr-code-container">
+                                        {qrLoading ? (
+                                            <div className="qr-loading">
+                                                <Loader2 size={24} className="spinner" />
+                                                <p>Generating QR Code...</p>
+                                            </div>
+                                        ) : qrCodeUrl ? (
+                                            <div className="qr-code">
+                                                <img 
+                                                    src={qrCodeUrl} 
+                                                    alt="PhonePe QR Code" 
+                                                    className="qr-image"
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div className="qr-error">
+                                                <AlertCircle size={48} />
+                                                <p>Failed to generate QR code</p>
+                                                <button 
+                                                    className="retry-btn"
+                                                    onClick={generatePhonePeQR}
+                                                >
+                                                    Retry
+                                                </button>
+                                            </div>
+                                        )}
+                                        <div className="qr-instructions">
+                                            <h4>Scan to Pay</h4>
+                                            <p>1. Open PhonePe/Any UPI app</p>
+                                            <p>2. Scan this QR code</p>
+                                            <p>3. Amount: {formatCurrency(amount)} </p>
+                                            <p>4. Complete payment</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="payment-details">
+                                        <div className="detail-row">
+                                            <span className="detail-label">Pay to:</span>
+                                            <span className="detail-value">hostelite@phonepe</span>
+                                        </div>
+                                        <div className="detail-row">
+                                            <span className="detail-label">Amount:</span>
+                                            <span className="detail-value">{formatCurrency(amount)}</span>
+                                        </div>
+                                        <div className="detail-row">
+                                            <span className="detail-label">Student ID:</span>
+                                            <span className="detail-value">{user._id}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="qr-actions">
+                                        <button 
+                                            className="verify-btn"
+                                            onClick={() => {
+                                                // Here you would typically verify the payment
+                                                alert('Payment verification will be implemented. For now, please contact admin after payment.');
+                                                setShowQrPayment(false);
+                                            }}
+                                        >
+                                            <Check size={16} />
+                                            I've Paid
+                                        </button>
+                                        <button 
+                                            className="cancel-btn"
+                                            onClick={() => setShowQrPayment(false)}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 
