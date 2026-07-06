@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import LoginPage from "./pages/LoginPage";
 import Register from "./pages/Register";
@@ -13,20 +13,17 @@ import WardenComplaints from "./pages/WardenComplaints";
 import AdminUsers from "./pages/AdminUsers";
 import AdminPayments from "./pages/AdminPayments";
 import StudentPayment from "./pages/StudentPayment";
-<<<<<<< HEAD
-import WardenMeals from "./pages/WardenMeals";
-import StudentMeals from "./pages/StudentMeals";
-import UnderConstruction from "./components/UnderConstruction";
-=======
 import AdvancePayment from "./pages/AdvancePayment";
 import RazorpayPayment from "./pages/RazorpayPayment";
 import UpiPayment from "./pages/UpiPayment";
 import DebitCardPayment from "./pages/DebitCardPayment";
->>>>>>> 078c759212cc076dd29e654e22a3933624ff4de8
+import WardenMeals from "./pages/WardenMeals";
+import StudentMeals from "./pages/StudentMeals";
+import UnderConstruction from "./components/UnderConstruction";
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         {/* ================= PUBLIC ROUTES ================= */}
         <Route path="/" element={<LoginPage />} />
@@ -142,6 +139,6 @@ export default function App() {
         {/* ================= FALLBACK ================= */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
