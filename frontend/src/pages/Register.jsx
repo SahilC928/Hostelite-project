@@ -141,13 +141,19 @@ export default function Register() {
     try {
       const res = await API.post("/auth/register", { name, email, password, role });
 
-      // Show success animation
-      setShowSuccess(true);
-      
-      setTimeout(() => {
-        alert("Registration successful!");
-        navigate("/login");
-      }, 1500);
+      if (res?.data?.token && res?.data?.user) {
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+
+        setShowSuccess(true);
+
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 1000);
+        return;
+      }
+
+      setError("Registration completed but no session was returned.");
     } catch (error) {
       console.error('Registration error:', error);
       if (error.response?.status === 409) {

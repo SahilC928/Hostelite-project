@@ -59,19 +59,22 @@ export default function Login() {
     try {
       const res = await API.post("/auth/login", { email, password });
 
-      if (res.data.token && res.data.user) {
+      if (res?.data?.token && res?.data?.user) {
         if (rememberMe) {
           localStorage.setItem('rememberedEmail', email);
         } else {
           localStorage.removeItem('rememberedEmail');
         }
 
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+        login(res.data.token, res.data.user);
+
         setShowSuccess(true);
-        
+
         setTimeout(() => {
-          login(res.data.token, res.data.user);
           navigate("/dashboard");
-        }, 1500);
+        }, 1000);
       } else {
         setError("Invalid response from server");
       }
