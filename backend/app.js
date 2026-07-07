@@ -8,7 +8,24 @@ const app = express();
 connectDB();
 
 // Middleware
-app.use(cors({ origin: "http://localhost:5173", credentials: true })); // allow frontend
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      const allowedOrigins = [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "https://sahilc928.github.io",
+      ];
+
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(null, false);
+      }
+    },
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 // Routes
