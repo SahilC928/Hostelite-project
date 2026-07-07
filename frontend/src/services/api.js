@@ -69,6 +69,18 @@ const loginDemoUser = (payload) => {
   return safeUser;
 };
 
+const parsePayload = (data) => {
+  if (!data) return {};
+  if (typeof data === "string") {
+    try {
+      return JSON.parse(data);
+    } catch {
+      return {};
+    }
+  }
+  return data;
+};
+
 const API = axios.create({
   baseURL: getBaseURL(),
 });
@@ -98,8 +110,9 @@ API.interceptors.response.use(
       (!error.response || error.response.status === 404 || error.response.status >= 500 || error.code === "ERR_NETWORK" || error.code === "NETWORK_ERROR");
 
     if (isAuthRequest && isOfflineMode) {
+      const payload = parsePayload(config.data);
+
       if (config.url?.endsWith("/auth/register")) {
-        const payload = JSON.parse(config.data || "{}");
         const newUser = createDemoUser(payload);
         return Promise.resolve({
           data: {
@@ -114,7 +127,6 @@ API.interceptors.response.use(
       }
 
       if (config.url?.endsWith("/auth/login")) {
-        const payload = JSON.parse(config.data || "{}");
         const user = loginDemoUser(payload);
         return Promise.resolve({
           data: {
